@@ -35,7 +35,8 @@ export class CustomerController {
 			phone?: string
 			totalSum?: number
 			description?: string
-			rentalPeriod?: string
+			rentalStart?: string
+			rentalEnd?: string
 		}
 	) {
 		const updated = await this.customerService.update(id, body)

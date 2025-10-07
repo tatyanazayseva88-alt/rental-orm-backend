@@ -28,9 +28,8 @@ export class CustomerService {
 		const customer = this.customerRepo.create({
 			fullName: dto.fullName,
 			phone: dto.phone,
-			rentalDateTime: dto.rentalDateTime,
-			rentalPeriod: dto.rentalPeriod,
-			rentalUnit: dto.rentalUnit,
+			rentalStart: dto.rentalStart,
+			rentalEnd: dto.rentalEnd,
 			description: dto.description,
 			source
 		})
@@ -76,7 +75,8 @@ export class CustomerService {
 			phone?: string
 			totalSum?: number
 			description?: string
-			rentalPeriod?: string
+			rentalStart?: string
+			rentalEnd?: string
 		}
 	) {
 		const customer = await this.customerRepo.findOne({
@@ -89,8 +89,8 @@ export class CustomerService {
 		if (data.phone !== undefined) customer.phone = data.phone
 		if (data.totalSum !== undefined) customer.totalSum = data.totalSum
 		if (data.description !== undefined) customer.description = data.description
-		if (data.rentalPeriod !== undefined)
-			customer.rentalPeriod = data.rentalPeriod
+		if (data.rentalStart !== undefined) customer.rentalStart = data.rentalStart
+		if (data.rentalEnd !== undefined) customer.rentalEnd = data.rentalEnd
 
 		return this.customerRepo.save(customer)
 	}

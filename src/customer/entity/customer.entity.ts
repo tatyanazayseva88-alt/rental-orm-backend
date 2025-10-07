@@ -21,13 +21,10 @@ export class CustomerEntity {
 	phone: string
 
 	@Column({ nullable: true })
-	rentalDateTime: string
+	rentalStart: string
 
 	@Column({ nullable: true })
-	rentalPeriod: string
-
-	@Column({ nullable: true })
-	rentalUnit: string
+	rentalEnd: string
 
 	@Column({ type: 'float', nullable: true })
 	totalSum: number
