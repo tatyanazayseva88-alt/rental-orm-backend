@@ -20,17 +20,20 @@ export class CustomerEntity {
 	@Column()
 	phone: string
 
-	@Column({ nullable: true })
-	rentalStart: string
+	@Column({ type: 'datetime', nullable: true })
+	rentalStart: Date | null
 
-	@Column({ nullable: true })
-	rentalEnd: string
+	@Column({ type: 'datetime', nullable: true })
+	rentalEnd: Date | null
 
 	@Column({ type: 'float', nullable: true })
 	totalSum: number
 
 	@Column({ type: 'text', nullable: true })
 	description: string
+
+	@Column({ type: 'boolean', default: false })
+	completed: boolean
 
 	@OneToMany(() => CustomerGearEntity, cg => cg.customer, { cascade: true })
 	customerGears: CustomerGearEntity[]

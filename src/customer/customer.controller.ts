@@ -48,4 +48,16 @@ export class CustomerController {
 		await this.customerService.delete(id)
 		return { message: `Customer #${id} deleted` }
 	}
+
+	@Put(':id/confirm')
+	async confirm(@Param('id', ParseIntPipe) id: number) {
+		const updated = await this.customerService.confirmCompletion(id)
+		return { message: `Customer #${id} confirmed`, data: updated }
+	}
+
+	@Put(':id/close-early')
+	async closeEarly(@Param('id', ParseIntPipe) id: number) {
+		const updated = await this.customerService.closeEarly(id)
+		return { message: `Customer #${id} closed early`, data: updated }
+	}
 }

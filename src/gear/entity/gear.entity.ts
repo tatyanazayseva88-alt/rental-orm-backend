@@ -15,6 +15,9 @@ export class GearEntity {
 	@Column()
 	count: number
 
+	@Column({ type: 'float', nullable: true })
+	purchasePrice: number
+
 	@OneToMany(() => CustomerGearEntity, cg => cg.gear)
 	customerGears: CustomerGearEntity[]
 }

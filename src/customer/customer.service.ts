@@ -28,13 +28,13 @@ export class CustomerService {
 		const customer = this.customerRepo.create({
 			fullName: dto.fullName,
 			phone: dto.phone,
-			rentalStart: dto.rentalStart,
-			rentalEnd: dto.rentalEnd,
+			rentalStart: dto.rentalStart ? new Date(dto.rentalStart) : null,
+			rentalEnd: dto.rentalEnd ? new Date(dto.rentalEnd) : null,
 			description: dto.description,
 			source
 		})
 
-		if (dto.gears && dto.gears.length > 0) {
+		if (dto.gears?.length) {
 			const gearIds = dto.gears.map(g => g.gear_id)
 			const gears = await this.gearRepo.find({ where: { id: In(gearIds) } })
 			customer.customerGears = dto.gears.map(g => ({
@@ -89,8 +89,12 @@ export class CustomerService {
 		if (data.phone !== undefined) customer.phone = data.phone
 		if (data.totalSum !== undefined) customer.totalSum = data.totalSum
 		if (data.description !== undefined) customer.description = data.description
-		if (data.rentalStart !== undefined) customer.rentalStart = data.rentalStart
-		if (data.rentalEnd !== undefined) customer.rentalEnd = data.rentalEnd
+		if (data.rentalStart !== undefined)
+			customer.rentalStart = data.rentalStart
+				? new Date(data.rentalStart)
+				: null
+		if (data.rentalEnd !== undefined)
+			customer.rentalEnd = data.rentalEnd ? new Date(data.rentalEnd) : null
 
 		return this.customerRepo.save(customer)
 	}
@@ -107,5 +111,20 @@ export class CustomerService {
 		}
 
 		return this.customerRepo.remove(customer)
+	}
+
+	async confirmCompletion(id: number) {
+		const customer = await this.customerRepo.findOne({ where: { id } })
+		if (!customer) throw new NotFoundException('Customer not found')
+		customer.completed = true
+		return this.customerRepo.save(customer)
+	}
+
+	async closeEarly(id: number) {
+		const customer = await this.customerRepo.findOne({ where: { id } })
+		if (!customer) throw new NotFoundException('Customer not found')
+		customer.rentalEnd = new Date()
+		customer.completed = true
+		return this.customerRepo.save(customer)
 	}
 }
