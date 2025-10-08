@@ -27,18 +27,7 @@ export class CustomerController {
 	}
 
 	@Put(':id')
-	async update(
-		@Param('id', ParseIntPipe) id: number,
-		@Body()
-		body: {
-			fullName?: string
-			phone?: string
-			totalSum?: number
-			description?: string
-			rentalStart?: string
-			rentalEnd?: string
-		}
-	) {
+	async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
 		const updated = await this.customerService.update(id, body)
 		return { message: `Customer #${id} updated`, data: updated }
 	}

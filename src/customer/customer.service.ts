@@ -11,10 +11,8 @@ export class CustomerService {
 	constructor(
 		@InjectRepository(CustomerEntity)
 		private readonly customerRepo: Repository<CustomerEntity>,
-
 		@InjectRepository(GearEntity)
 		private readonly gearRepo: Repository<GearEntity>,
-
 		@InjectRepository(CustomerSourceEntity)
 		private readonly sourceRepo: Repository<CustomerSourceEntity>
 	) {}
@@ -31,15 +29,17 @@ export class CustomerService {
 			rentalStart: dto.rentalStart ? new Date(dto.rentalStart) : null,
 			rentalEnd: dto.rentalEnd ? new Date(dto.rentalEnd) : null,
 			description: dto.description,
+			discount: dto.discount ?? 0,
 			source
 		})
 
 		if (dto.gears?.length) {
 			const gearIds = dto.gears.map(g => g.gear_id)
 			const gears = await this.gearRepo.find({ where: { id: In(gearIds) } })
+
 			customer.customerGears = dto.gears.map(g => ({
 				gear: gears.find(x => x.id === g.gear_id)!,
-				count: g.count
+				count: g.count * (g.days ?? 1)
 			})) as any
 		}
 
@@ -51,21 +51,31 @@ export class CustomerService {
 			relations: ['customerGears', 'customerGears.gear', 'source']
 		})
 
-		return customers.map(c => ({
-			...c,
-			totalSum:
+		return customers.map(c => {
+			const total =
 				c.totalSum ??
 				c.customerGears?.reduce(
 					(sum, g) => sum + (g.gear?.price ?? 0) * g.count,
 					0
 				) ??
-				0,
-			gears:
-				c.customerGears?.map(cg => ({
-					gear_id: cg.gear.id,
-					count: cg.count
-				})) ?? []
-		}))
+				0
+
+			const totalWithDiscount = c.discount
+				? total - (total * c.discount) / 100
+				: total
+
+			return {
+				...c,
+				totalSum: totalWithDiscount,
+				gears:
+					c.customerGears?.map(cg => ({
+						gear_id: cg.gear.id,
+						count: cg.count
+					})) ?? [],
+				discount: c.discount ?? 0,
+				completed: c.completed ?? false
+			}
+		})
 	}
 
 	async update(
@@ -74,6 +84,7 @@ export class CustomerService {
 			fullName?: string
 			phone?: string
 			totalSum?: number
+			discount?: number
 			description?: string
 			rentalStart?: string
 			rentalEnd?: string
@@ -88,6 +99,7 @@ export class CustomerService {
 		if (data.fullName !== undefined) customer.fullName = data.fullName
 		if (data.phone !== undefined) customer.phone = data.phone
 		if (data.totalSum !== undefined) customer.totalSum = data.totalSum
+		if (data.discount !== undefined) customer.discount = data.discount
 		if (data.description !== undefined) customer.description = data.description
 		if (data.rentalStart !== undefined)
 			customer.rentalStart = data.rentalStart
@@ -105,11 +117,8 @@ export class CustomerService {
 			relations: ['customerGears']
 		})
 		if (!customer) throw new NotFoundException('Customer not found')
-
-		if (customer.customerGears?.length) {
+		if (customer.customerGears?.length)
 			await this.customerRepo.manager.remove(customer.customerGears)
-		}
-
 		return this.customerRepo.remove(customer)
 	}
 

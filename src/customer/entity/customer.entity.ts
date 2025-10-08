@@ -29,6 +29,9 @@ export class CustomerEntity {
 	@Column({ type: 'float', nullable: true })
 	totalSum: number
 
+	@Column({ type: 'float', default: 0 })
+	discount: number
+
 	@Column({ type: 'text', nullable: true })
 	description: string
 

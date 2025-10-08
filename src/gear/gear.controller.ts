@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, Put, Param, Delete, ParseIntPipe } from '@nestjs/common'
+import {
+	Controller,
+	Post,
+	Body,
+	Get,
+	Put,
+	Param,
+	Delete,
+	ParseIntPipe
+} from '@nestjs/common'
 import { GearService } from './gear.service'
 import { CreateGearDto } from './dto/create-gear.dto'
 import { GearEntity } from './entity/gear.entity'
@@ -26,7 +35,9 @@ export class GearController {
 	}
 
 	@Delete(':id')
-	async delete(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+	async delete(
+		@Param('id', ParseIntPipe) id: number
+	): Promise<{ message: string }> {
 		return this.gearService.deleteGear(id)
 	}
 }

@@ -17,7 +17,9 @@ export class CustomerGearEntity {
 	@JoinColumn({ name: 'customer_id' })
 	customer: CustomerEntity
 
-	@ManyToOne(() => GearEntity, gear => gear.customerGears, { onDelete: 'CASCADE' })
+	@ManyToOne(() => GearEntity, gear => gear.customerGears, {
+		onDelete: 'CASCADE'
+	})
 	@JoinColumn({ name: 'gear_id' })
 	gear: GearEntity
 
